@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css">
+<title>TenSeconds AI — Free</title>
+</head>
+<body><main class="shell">
+<header class="top"><div class="brand-icon">▶</div><div><h1>TenSeconds <span>AI</span></h1><p>Free community-model edition</p></div><div class="pill">FREE</div></header>
+<section class="hero"><div class="eyebrow">YOUR STORY STUDIO</div><h2>Turn your idea into a video.</h2><p>Generate short animated-style clips from a text prompt using a public free model. No paid video API key is required.</p></section>
+<section class="panel"><form id="form">
+<label for="prompt">Describe your scene</label>
+<textarea id="prompt" maxlength="1600" required placeholder="Example: 2D animated Indian school corridor, Varun walks toward the camera while two students whisper, dramatic cinematic lighting, smooth subtle motion, consistent character design."></textarea>
+<div class="hint">For better results, describe one action, the location, camera movement and animation style.</div>
+<div class="grid2"><div><label for="duration">Clip length</label><select id="duration"><option value="5">5 seconds</option><option value="8">8 seconds (maximum)</option></select></div><div><label for="aspect">Video format</label><select id="aspect"><option value="16:9">Landscape 16:9</option><option value="9:16">Vertical 9:16</option><option value="1:1">Square 1:1</option></select></div></div>
+<div class="free-card"><strong>₹0 API cost</strong><span>Uses shared free GPU capacity. Waiting time and usage limits can vary.</span></div>
+<button id="go" type="submit">✦ Generate free video</button>
+<p class="disclaimer">This free engine currently supports text-to-video. Image-to-video, guaranteed uptime and unlimited generations are not included.</p>
+</form></section>
+<section id="status" class="status hidden" aria-live="polite"></section>
+<section id="result" class="panel hidden"><h3>Your clip</h3><video id="video" controls playsinline></video><div class="actions"><a id="open" class="button secondary" target="_blank" rel="noopener">Open video</a><a id="download" class="button" target="_blank" rel="noopener">Save video</a></div><p class="hint">Save it soon; the provider may change or expire generated links.</p></section>
+<section class="panel small-panel"><h3>How free mode works</h3><p>TenSeconds AI sends your prompt to the public LTX-Video demo hosted by Hugging Face. It uses shared community GPU capacity, so it may queue, fail, or be paused. You can optionally add a free Hugging Face read token on your server for better access, but no paid video API is required. This prototype does not promise unlimited usage.</p></section>
+<footer>TenSeconds AI · Free prototype · Keep private information out of prompts.</footer>
+</main><script src="/app.js"></script></body></html>
