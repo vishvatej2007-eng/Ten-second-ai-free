@@ -13,7 +13,11 @@
 <textarea id="prompt" maxlength="1600" required placeholder="Example: 2D animated Indian school corridor, Varun walks toward the camera while two students whisper, dramatic cinematic lighting, smooth subtle motion, consistent character design."></textarea>
 <div class="hint">For better results, describe one action, the location, camera movement and animation style.</div>
 <div class="grid2"><div><label for="duration">Clip length</label><select id="duration"><option value="5">5 seconds</option><option value="8">8 seconds (maximum)</option></select></div><div><label for="aspect">Video format</label><select id="aspect"><option value="16:9">Landscape 16:9</option><option value="9:16">Vertical 9:16</option><option value="1:1">Square 1:1</option></select></div></div>
-<div class="free-card"><strong>₹0 API cost</strong><span>Uses shared free GPU capacity. Waiting time and usage limits can vary.</span></div>
+<div class="free-card"><strong>₹0 API cost</strong><span>Uses shared free GPU capacity. Waiting time and usage limits can vary.</span></div>    <div style="margin-bottom: 12px;">
+     <label for="imageInput" style="display:block; margin-bottom:4px; font-size:0.9rem;">Reference Image (Optional):</label>
+     <input type="file" id="imageInput" accept="image/*" style="width:100%; padding:6px;" />
+   </div>
+
 <button id="go" type="submit">✦ Generate free video</button>
 <p class="disclaimer">This free engine currently supports text-to-video. Image-to-video, guaranteed uptime and unlimited generations are not included.</p>
 </form></section>
