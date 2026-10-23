@@ -4,7 +4,18 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SPACE = "https://lightricks-ltx-video-distilled.hf.space";
 app.use(express.static("public"));
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: "1mb" }));// PIN Protection
+const APP_PIN = process.env.APP_PIN || "1234";
+
+app.use((req, res, next) => {
+  if (req.path === "/" || req.path.startsWith("/public")) return next();
+  const userPin = req.headers["x-app-pin"];
+  if (userPin !== APP_PIN) {
+    return res.status(401).json({ error: "Unauthorized: Invalid PIN" });
+  }
+  next();
+});
+
 
 function parseResult(raw) {
   const blocks = raw.split("\n\n").filter(Boolean).reverse();
