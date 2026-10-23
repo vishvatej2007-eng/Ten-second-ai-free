@@ -1,3 +1,41 @@
-const form=document.querySelector("#form"),promptEl=document.querySelector("#prompt"),duration=document.querySelector("#duration"),aspect=document.querySelector("#aspect"),go=document.querySelector("#go"),statusEl=document.querySelector("#status"),result=document.querySelector("#result"),video=document.querySelector("#video"),open=document.querySelector("#open"),download=document.querySelector("#download");
-function status(msg,type=""){statusEl.textContent=msg;statusEl.className="status "+type;}
-form.addEventListener("submit",async e=>{e.preventDefault();if(!promptEl.value.trim())return status("Enter a scene prompt first.","error");go.disabled=true;go.textContent="Generating… the free queue may take a few minutes";result.classList.add("hidden");status("Submitting to the free community model. Keep this page open; the shared queue can take 30 seconds to several minutes.","loading");try{const r=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:promptEl.value.trim(),duration:Number(duration.value),aspect:aspect.value})});const data=await r.json();if(!r.ok)throw new Error(data.error||"Generation failed.");video.src=data.videoUrl;open.href=data.videoUrl;download.href=data.videoUrl;download.setAttribute("download","tenseconds-ai-free.mp4");result.classList.remove("hidden");status("Your clip is ready. Open it or save it to your phone.");result.scrollIntoView({behavior:"smooth",block:"start"});}catch(err){status(err.message||"The free model is busy. Try again later.","error");}finally{go.disabled=false;go.textContent="✦ Generate free video";}});
+const form = document.querySelector("#form"), 
+      promptEl = document.querySelector("#prompt"), 
+      statusEl = document.querySelector("#status"),
+      videoEl = document.querySelector("#video");
+
+function status(msg, type="") {
+  if (statusEl) {
+    statusEl.textContent = msg;
+    statusEl.className = `status ${type}`;
+  }
+}
+
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  const prompt = promptEl.value.trim();
+  if (!prompt) return status("Please enter a prompt.", "error");
+
+  status("Generating video (this may take a moment)...", "loading");
+
+  try {
+    const res = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-app-pin": "9876" // Replace with your exact Render APP_PIN value
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Generation failed.");
+
+    status("Video generated successfully!", "success");
+    if (videoEl && data.videoUrl) {
+      videoEl.src = data.videoUrl;
+      videoEl.parentElement.classList.remove("hidden");
+    }
+  } catch (err) {
+    status(err.message, "error");
+  }
+});
