@@ -43,50 +43,73 @@ app.get("/api/status", (_req, res) => {
   });
 });
 
-app.post("/api/generate", async (req, res) => {
+app.post('/api/generate', async (req, res) => {
   try {
-    const prompt = String(req.body?.prompt || "").trim();
-    const duration = Number(req.body?.duration || 5);
-    const aspect = String(req.body?.aspect || "16:9");
+    const prompt = String(req.body.prompt || '').trim();
+    const duration = Number(req.body.duration || 5);
+    const aspect = String(req.body.aspect || '16:9');
+    const image = req.body.image || null; // Captured base64 image
+
     if (!prompt) return res.status(400).json({ error: "Enter a prompt first." });
     if (!Number.isFinite(duration) || duration < 3 || duration > 8) {
-      return res.status(400).json({ error: "This free model supports about 3–8 seconds. Choose 5 or 8 seconds." });
+      return res.status(400).json({ error: "This free model supports about 3-8 seconds. Choose 5 or 8 seconds." });
     }
-    const [w, h] = aspect === "9:16" ? [512, 704] : aspect === "1:1" ? [576, 576] : [704, 512];
+
+    const [w, h] = aspect === '9:16' ? [512, 704] : aspect === '1:1' ? [576, 576] : [704, 512];
     const headers = { "Content-Type": "application/json" };
     if (process.env.HF_TOKEN) headers.Authorization = `Bearer ${process.env.HF_TOKEN}`;
-    const submit = await fetch(`${SPACE}/gradio_api/call/text_to_video`, {
+
+    // Switch endpoint & payload based on whether an image was provided
+    const endpoint = image ? `${SPACE}/gradio_api/call/image_to_video` : `${SPACE}/gradio_api/call/text_to_video`;
+    
+    const requestData = image ? [
+      image, // input image
+      prompt,
+      "worst quality, blurry, distorted, watermark",
+      h,
+      w,
+      duration,
+      0,
+      Math.floor(Math.random() * 1000000000),
+      true,
+      1,
+      true
+    ] : [
+      prompt,
+      "worst quality, blurry, distorted, watermark",
+      "",
+      h,
+      w,
+      "text-to-video",
+      duration,
+      0,
+      Math.floor(Math.random() * 1000000000),
+      true,
+      1,
+      true
+    ];
+
+    const submit = await fetch(endpoint, {
       method: "POST",
       headers,
-      body: JSON.stringify({ data: [
-        prompt,
-        "worst quality, blurry, distorted, watermark",
-        "",
-        "",
-        h,
-        w,
-        "text-to-video",
-        duration,
-        9,
-        Math.floor(Math.random() * 1000000000),
-        true,
-        1,
-        true
-      ]}),
+      body: JSON.stringify({ data: requestData }),
       signal: AbortSignal.timeout(30000)
     });
+
     if (!submit.ok) throw new Error(`Free model is busy or unavailable (HTTP ${submit.status}). Try again in a few minutes.`);
-    const { event_id: eventId } = await submit.json();
-    if (!eventId) throw new Error("The free model did not provide a job ID.");
-    const result = await fetch(`${SPACE}/gradio_api/call/text_to_video/${eventId}`, {
+    const { event_id } = await submit.json();
+    if (!event_id) throw new Error("The free model did not provide a job ID.");
+
+    const result = await fetch(`${endpoint}/${event_id}`, {
       headers,
       signal: AbortSignal.timeout(300000)
     });
+
     if (!result.ok || !result.body) throw new Error("Lost connection to the free model. Please try again.");
     const raw = await result.text();
-    res.json(parseResult(raw));
+    const videoUrl = parseResult(raw);
+    res.json({ videoUrl });
   } catch (e) {
-    res.status(502).json({ error: e?.message || "Free video generation failed. Try again." });
+    res.status(502).json({ error: e.message || "Free video generation failed. Try again." });
   }
 });
-app.listen(PORT, () => console.log(`TenSeconds AI Free running on http://localhost:${PORT}`));
