@@ -3,8 +3,8 @@ import express from "express";
 const app = express();
 const PORT = process.env.PORT || 3000;
 const SPACE = "https://lightricks-ltx-video-distilled.hf.space";
-app.use(express.static("public"));
-app.use(express.json({ limit: "1mb" }));// PIN Protection
+app.use(express.json({ limit: "50mb" }));
+// PIN Protection
 const APP_PIN = process.env.APP_PIN || "1234";
 
 app.use((req, res, next) => {
